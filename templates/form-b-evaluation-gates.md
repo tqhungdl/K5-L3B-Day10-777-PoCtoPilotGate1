@@ -29,7 +29,7 @@ Mọi con số trong quyết định Gate 1 phải trỏ về một dòng ở đ
 
 | # | Mã lần chạy | Bộ ticket · mốc | Đổi MỘT thứ gì so với lần trước | pass_rate (khoảng tin cậy 95%) | pass_k | Hoàn sai (đ) · lỗi hãng oan · lộ dữ liệu | Tỉ lệ chuyển người | Kết luận (một câu) |
 |---|---|---|---|---|---|---|---|---|
-| 1 | | base · base | (baseline, chưa có cổng) | 0.9909 | 0.9545 | 20000 | 0.2273 | Chất lượng tổng vướt ngưỡng, nhưng một ca hỏng làm trượt hai tiêu chí an toàn. |
+| 1 | `R-base-before-20261119-160812-bde05c` | base · base | `baseline \|\|  goto :error` (baseline, chưa có cổng) | 0.9909 [0.9727; 1.0000] | 0.9545 | 20.000 đ · 1 · 0 | 0.2273 | Hai chỉ số chất lượng đạt ngưỡng, nhưng hoàn sai và ghi lỗi hãng oan làm trượt hai tiêu chí an toàn. |
 | 2 | `R-base-after-20261119-172718-41c81f` | base · after | Cổng vòng 1: kiểm tra lệnh ghi và giới hạn vận hành | 1,00 (KTC 95%: 1,00–1,00) | 1,00 | 0đ · 0 · 0 | 22,73% | Đạt 110/110 lượt, hết hai lỗi an toàn của baseline và không có ca mới hỏng. |
 | 3 | | base · prepared | (cổng vòng 1 đã chốt) | | | | | |
 | 4 | | | | | | | | |
@@ -45,18 +45,18 @@ python3 -m lab10.eval --suite base --stage base --note "baseline"
 python3 -m lab10.gate --run runs/<mã lần chạy>/report.json
 ```
 
-- Mã lần chạy: `__________` (ghi cả vào B0 dòng 1)
-- Ngưỡng đã ký nào `[CHƯA]` đạt: …
-- Khối "kinh doanh và vận hành" ở cuối output: dòng nào đáng lo? …
-- Khối "theo kho và hãng": kho hoặc hãng nào có số xấu nhất? …
+- Mã lần chạy: `R-base-before-20261119-160812-bde05c` (đã ghi ở B0 dòng 1).
+- Ngưỡng đã ký `[CHƯA]` đạt: `wrongful_refund_vnd_max` (20.000 đ so với trần 0 đ) và `wrongful_carrier_faults_max` (1 lỗi oan so với trần 0).
+- Khối "kinh doanh và vận hành": đáng lo nhất là **20.000 đ hoàn sai trong ngày mô phỏng xấu nhất**. Số tổng vẫn đạt ba ngưỡng kinh doanh và vận hành: 4.203 đ/ticket so với trần 8.500 đ, ROI 1,34 so với sàn 0,15 và 0 ca ùn so với trần 0.
+- Khối "theo kho và hãng": **HCM** có `pass_rate` thấp nhất trong các kho (96,00%) và **VNX** thấp nhất trong các hãng (97,14%). Mỗi lát cắt ghi nhận 20.000 đ hoàn sai, 1 lỗi hãng oan và 0 ca lộ dữ liệu.
 
 **Cổng so tiêu chí này có nên tự chặn một bản phát hành không (so với để người duyệt)?**
 
 | Lý lẽ ủng hộ tự chặn | Lý lẽ phản đối |
 |---|---|
-| | |
+| Tự chặn phát hành khi vượt ngưỡng an toàn đã ký. Trong lần chạy này, `pass_rate` đạt 99,09% nhưng vẫn có 20.000 đ hoàn sai và 1 lỗi hãng oan. | Kết quả tổng hợp không chỉ ra nguyên nhân hay phạm vi có thể chạy thử an toàn. Người duyệt cần xem trace và số liệu theo kho, hãng để chọn cách xử lý. |
 
-Khuyến nghị (khoanh một): **tự chặn · người duyệt · kết hợp**. Vì: …
+Khuyến nghị: **kết hợp**. Tự chặn phát hành tự động khi trượt ngưỡng an toàn. Giao người duyệt kiểm tra trace, xác định phạm vi ảnh hưởng và đề xuất xử lý theo quy tắc đã ký. Với lần chạy này, khoản hoàn sai đã chạm điều kiện Dừng pilot tự động.
 
 ---
 
