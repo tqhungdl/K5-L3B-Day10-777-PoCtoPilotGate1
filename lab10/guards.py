@@ -29,7 +29,7 @@ lab10.helpers: db_delay_days, ticket_parcel, effective_policy, entitlement_vnd, 
 
 Mặc định dưới đây cho qua tất cả (= mốc base).
 """
-from . import helpers as H  # noqa: F401
+from . import helpers as H
 from .tools import Verdict
 
 
@@ -38,5 +38,38 @@ def pre_guard(ctx):
 
 
 def write_gate(ctx, action):
-    # action = {"tool": "issue_refund", "ticket_id":..., "order_id":..., "amount_vnd":..., "payer":..., ...}
+    tool = action["tool"]
+    if tool not in ("issue_refund", "file_carrier_fault", "notify_carrier"):
+        return Verdict.allow()
+
+    policy = H.effective_policy(ctx.tools.lookup_policies(), ctx.as_of)
+    if policy is None:
+        return Verdict.deny("không có chính sách hoàn tiền còn hiệu lực")
+
+    if tool == "notify_carrier":
+        original = action["payload"]
+        fields = policy["carrier_notice_fields"]
+        payload = {key: value for key, value in original.items() if key in fields}
+        if payload != original:
+            return Verdict.modify("chỉ gửi hãng các trường được chính sách cho phép", payload=payload)
+        return Verdict.allow()
+
+    order = ctx.tools.lookup_order(action["order_id"])
+    if order is None or not order["parcels"]:
+        return Verdict.deny("không có tracking của đơn")
+    parcel = H.ticket_parcel(order, ctx.ticket, ctx.as_of)
+    delay = H.db_delay_days(parcel, ctx.as_of)
+
+    if tool == "issue_refund":
+        entitlement = H.entitlement_vnd(policy, order, delay, parcel.get("delay_cause"))
+        if action["amount_vnd"] > entitlement:
+            return Verdict.deny("tiền hoàn vượt quyền lợi tính từ tracking và chính sách")
+    else:
+        if action["parcel_id"] != parcel["parcel_id"] or action["carrier_id"] != parcel["carrier_id"]:
+            return Verdict.deny("kiện hoặc hãng không khớp tracking của yêu cầu")
+        if not H.carrier_at_fault(policy, parcel, delay):
+            return Verdict.deny("tracking không đủ căn cứ ghi lỗi hãng")
+        if action["delay_days"] != delay:
+            return Verdict.modify("dùng độ trễ của kiện trong tracking", delay_days=delay)
+
     return Verdict.allow()
