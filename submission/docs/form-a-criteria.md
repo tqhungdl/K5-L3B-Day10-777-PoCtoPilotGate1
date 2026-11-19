@@ -74,9 +74,9 @@ _(Ở vòng 2, Phiếu C mục C8 dùng lại đúng bảng ba ô này cho chỉ
 
 ### Câu 1.5 · Chọn MỘT kết luận và giải thích một câu
 
-Số minh hoạ trong đề (không phải số của bàn). Khoanh: **(a) · (b) · (c) · (d)**
+Số minh hoạ trong đề (không phải số của bàn). Khoanh: **(b)**
 
-Giải thích một câu: …
+Giải thích một câu: Giá trị 1,0 của bản Y nằm hoàn toàn trong khoảng tin cậy 95% [0,9400; 1,0] của bản X (chênh lệch chỉ 1/50 lần chạy) nên chưa đủ căn cứ thống kê để khẳng định Y tốt hơn X.
 
 ---
 
