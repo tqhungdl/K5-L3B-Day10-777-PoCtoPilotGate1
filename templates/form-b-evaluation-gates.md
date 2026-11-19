@@ -391,22 +391,22 @@ bao nhiêu thời gian? (3) Có phần nào của dự án không nên làm ti�
 
 | | **v1** (phút 105–115, TRƯỚC khi nhận thẻ sự cố) |
 |---|---|
-| Commit ký tiêu chí (message `Sign acceptance criteria`; hash commit, tuỳ chọn) | |
-| Hash chốt cổng vòng 1 (8 ký tự lệnh `lab10.checkpoint` in ra, tuỳ chọn) | |
-| Mã lần chạy dùng làm bằng chứng | bộ nền, mốc base: ________ · bộ nền với cổng vòng 1 (prepared): ________ |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | |
-| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Đọc khối "theo kho và hãng" ở cuối output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | |
-| Quyết định (khoanh một) | Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | |
-| Bằng chứng 2 | |
-| Bằng chứng 3 | |
-| Khớp dòng nào trong `decision_rule` đã ký? | |
-| Nếu Thu hẹp: cắt phần nào, vì sao | |
-| Nếu Cải tiến thêm: giả thuyết cụ thể + hạn | |
-| Nếu Dừng: bài học ghi lại | |
-| Một bằng chứng còn thiếu (thứ bộ nền chưa đo được) | |
-| Ngày quyết định lại (trừ khi Dừng) | |
-| PIC ký | |
+| Commit ký tiêu chí (message `Sign acceptance criteria`; hash commit, tuỳ chọn) | `014231f` |
+| Hash chốt cổng vòng 1 (8 ký tự lệnh `lab10.checkpoint` in ra, tuỳ chọn) | `f764bef4` |
+| Mã lần chạy dùng làm bằng chứng | Bộ nền, mốc `base`: `R-base-before-20261119-160812-bde05c` · Bộ nền với cổng vòng 1, mốc `prepared`: `R-base-prepared-20261119-173714-f00bdc`. |
+| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | Báo cáo `prepared` không ghi nhận dòng vượt trần (`ops.violations` rỗng). Chờ tối đa 0 phút, 0 ca ùn, chi phí 4.202 đ/ticket, ROI 1,38 và hoàn tự động tối đa 155.000 đ/ngày so với trần 2.000.000 đ. |
+| Kho hoặc hãng có số xấu nhất. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? | Mọi kho và hãng đều đạt `pass_rate` 100% và không có lỗi an toàn ở mốc `prepared`. Trong các kho có mã, DN tốn nhất (4.586 đ/ticket), vẫn dưới ngưỡng toàn bộ 8.500 đ/ticket, nên quyết định không đổi. Nhóm chưa xác định được kho (`?`) có 1 ticket, chi phí 10.359 đ/ticket và chuyển duyệt 100%. Cần theo dõi riêng chi phí nhóm này. |
+| Quyết định (khoanh một) | **Tiếp tục** |
+| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | `R-base-prepared-20261119-173714-f00bdc`: `pass_rate` 1,0000 (KTC 95% [1,0000; 1,0000]) đạt sàn 0,90; `pass_k` 1,0000 đạt sàn 0,85. |
+| Bằng chứng 2 | `R-base-before-20261119-160812-bde05c` có 20.000 đ hoàn sai, 1 lỗi hãng oan và 0 ca lộ dữ liệu. `R-base-prepared-20261119-173714-f00bdc` đưa cả ba chỉ số về 0, đạt cả ba trần an toàn. |
+| Bằng chứng 3 | `R-base-prepared-20261119-173714-f00bdc`: chi phí 4.202 đ/ticket ≤ 8.500 đ, ROI 1,38 ≥ 0,15, 0 ca ùn và độ phủ 100%. Tỷ lệ chuyển duyệt 22,73% đạt ngưỡng nên có 25%. |
+| Khớp dòng nào trong `decision_rule` đã ký? | **Tiếp tục**. Tất cả ngưỡng bắt buộc và kinh doanh/vận hành đều đạt, báo cáo không có dòng vượt trần. |
+| Nếu Thu hẹp: cắt phần nào, vì sao | Không áp dụng. |
+| Nếu Cải tiến thêm: giả thuyết cụ thể + hạn | Không áp dụng. |
+| Nếu Dừng: bài học ghi lại | Không áp dụng. |
+| Một bằng chứng còn thiếu (thứ bộ nền chưa đo được) | Chưa có số liệu thời gian chờ và số ca ùn khi ticket dồn vào giờ cao điểm với một người duyệt. |
+| Ngày quyết định lại (trừ khi Dừng) | `2026-11-26` (theo Phiếu A). |
+| PIC ký | Trần Quang Hưng (trưởng nhóm, Vận hành và pháp lý). |
 
 Xong v1 thì lưu và đẩy một bản (sau mốc này không sửa cột v1):
 
