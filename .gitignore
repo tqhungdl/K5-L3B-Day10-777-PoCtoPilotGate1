@@ -5,3 +5,4 @@ __pycache__/
 # Kết quả mỗi lần chạy. Lệnh 7 (check_submission --collect) chép những gì cần nộp vào submission/.
 /runs/
 AGENTS.md
+CHECKLIST.md
