@@ -13,10 +13,10 @@ Họ tên đầy đủ và MSSV của **mọi** thành viên; bàn 3 người th
 
 | STT | Họ và tên | MSSV | Vai | Trưởng nhóm |
 | --: | --------- | ---- | --- | :---------: |
-|   1 |           |      |     |             |
-|   2 |           |      |     |             |
-|   3 |           |      |     |             |
-|   4 |           |      |     |             |
+|   1 | Trần Quang Hưng | 2A202603767 | Vận hành và pháp lý |      X       |
+|   2 | Nguyễn Tiến Đạt | 2A202603752 | Kỹ sư cổng |             |
+|   3 | Cao Phạm Tân Khải | 2A202603883 | Kỹ sư cổng |             |
+|   4 | Nguyễn Quang Huy | 2A202603768 | Sản phẩm và kinh doanh |             |
 
 Ghi `members` trong `submission/submission.json` theo dạng `"HoVaTen-MSSV"`, khớp bảng trên.
 
