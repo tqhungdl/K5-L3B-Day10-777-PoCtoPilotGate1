@@ -250,15 +250,15 @@ Mốc `R-S7-before-20261119-174617-41c81f`.
 
 ## C7 · Câu 3.5 · Bảng sửa: nguyên nhân → chỗ sửa → giảm hay ngăn
 
-Vòng 1 đã chặn hai đường lộ quan sát được. Vòng 2 thêm monitor và giữ phạm vi 100%, 1 người duyệt, các giới hạn vận hành và cổng đang dùng.
+Vòng 1 đã chặn hai đường lộ quan sát được. Vòng 2 giữ các cổng và giới hạn vận hành, đồng thời đo tỷ lệ lượt có thông báo sai tập khóa để phát hiện tái diễn.
 
 | Nhánh | Nguyên nhân | Chỗ xử lý | Tầng · giảm hay ngăn | Bằng chứng |
 |---|---|---|---|---|
-| [1] | Chép lời khách vào `customer_note`. | Giữ `guards.write_gate` nhánh `notify_carrier`, lọc theo `carrier_notice_fields`. | Chặn · trường ngoài danh sách bị bỏ trước gửi. | `S7-01@11`, prepared và after có bốn trường. |
-| [2] | Tự ghép `recipient_contact` từ hồ sơ đơn. | Giữ cùng guard và trường cấm trong `legal`. | Chặn · loại trường liên hệ, vẫn cho gửi thông báo hợp lệ. | `S7-20@11`, prepared và after có bốn trường. |
-| [3] | Giá trị sai nằm trong khóa hợp lệ. | Kiểm mẫu giá trị quận/huyện trong pilot. Monitor mới chỉ theo dõi cấu trúc. | Phát hiện · giảm thời gian phát hiện khi kiểm mẫu, chưa có cổng xác thực giá trị. | Risk register C10. |
+| [1] | Lời khách gửi CSKH bị chép vào `customer_note`. | `lab10/guards.py` · `write_gate` lọc payload `notify_carrier` theo `carrier_notice_fields` của chính sách đang hiệu lực. | Ngăn trường ngoài danh sách rời hệ thống qua lệnh gửi đã qua cổng. | `S7-01@11` gửi `customer_note` ở base. Prepared và after chỉ gửi `order_id`, `parcel_id`, `district` và `delay_days`. |
+| [2] | `recipient_contact` được lấy từ `orders[].recipient` của đơn quà dù ticket chỉ xin hoàn phí. | Cùng bộ lọc tại `write_gate`. Lớp gửi áp dụng thêm `legal.pii_fields_blocked_to_third_party` trong `config/operating_gates.json`. | Ngăn trường liên hệ trước khi gửi, cả khi dữ liệu đến từ hồ sơ đơn. | `S7-20@11` gửi `recipient_contact` ở base. Prepared và after vẫn gửi thông báo nghiệp vụ sau khi bỏ trường liên hệ. |
+| [3] | Giá trị nhạy cảm có thể nằm trong khóa hợp lệ, chẳng hạn địa chỉ chi tiết trong `district`. | Kiểm mẫu giá trị `district` theo danh mục quận/huyện trong pilot (C10). | Phát hiện qua kiểm mẫu. Cổng hiện kiểm tên trường và monitor đo tập khóa, nên giá trị sai có thể đi qua cả hai. | Giả thuyết từ C1, chưa thấy trong trace S7. |
 
-Lần chạy sau sửa `R-S7-after-20261119-194747-03db1f` đạt 40/40 lượt.
+`lab10/monitors.py` thêm `carrier_notice_schema_violation_rate` để phát hiện lượt đã gửi thông báo sai tập khóa (xem C8). Với bộ báo cáo `20261119-194749-03db1f`, số lượt lộ PII ở base → prepared → after là **30 → 0 → 0**, còn tỷ lệ lượt sai tập khóa là **87,5% → 0% → 0%**. After đạt **40/40** lượt trên S7. Ca đối chứng `S7-05@11` vẫn được hoàn đúng 18.000đ và giữ thông báo hợp lệ sau khi áp cổng.
 
 ---
 
