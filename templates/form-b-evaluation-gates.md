@@ -165,15 +165,12 @@ mà cả bàn chưa nghĩ tới, không phải tả lại nhánh đã biết.
 **Câu hỏi dẫn dắt:** tool nào tạo ra hậu quả không đảo ngược? Mỗi tham số của tool đó lấy từ đâu (ticket, DB, model tự suy)?
 Với mỗi guideword: hậu quả cho ai, hiện có gì ngăn, cần thêm gate ở tầng nào (phát hiện / chặn / giới hạn thiệt hại)?
 
-Tool chọn phân tích: `________________` (gợi ý: `issue_refund`, `file_carrier_fault`, `notify_carrier`)
-
+Tool chọn phân tích: `issue_refund`
 | Tham số / dòng dữ liệu | Guideword | Lệch cụ thể (viết bằng dữ kiện của lab) | Hậu quả, cho ai | Hiện có gì ngăn? | Gate đề xuất + tầng |
 |---|---|---|---|---|---|
-| | WRONG | | | | |
-| | INVALID | | | | |
-| | INCOMPLETE | | | | |
-| | PERTURBED | | | | |
-| | INCAPABLE | | | | |
+| `amount_vnd` | WRONG | Số tiền tính theo số ngày khách tự khai (5 ngày) thay vì tracking DB (2 ngày) như ở `T-002@55` | LogiX mất tiền hoàn oan 20.000đ; quỹ bồi hoàn bị thâm hụt | Chưa có (chỉ kiểm không quá tổng tiền đơn) | So sánh số tiền yêu cầu với quyền lợi tính từ tracking DB (`H.entitlement_vnd`), tầng Chặn. |
+| `order_id` | INVALID | Khách gửi mã đơn đã hủy hoặc đơn thuộc đợt giao khác đã hoàn tiền trước đó | Trùng lặp hoàn tiền, LogiX thất thoát kép | Kiểm tra sổ cái sơ bộ | Kiểm tra lịch sử hoàn tiền trong ledger seed theo `order_id`, tầng Chặn. |
+| `approval_id` | INCOMPLETE | Khoản hoàn > 200.000đ nhưng không có mã phê duyệt của người quản lý | Vi phạm chính sách kiểm soát nội bộ của Finance | Chưa có | Kiểm tra hạn mức: nếu > auto_limit_vnd mà thiếu approval hợp lệ thì chuyển người duyệt, tầng Vận hành. |
 
 Không bắt buộc điền đủ năm dòng. Bắt buộc: **ít nhất ba dòng, trong đó một dòng là nhánh bàn chưa thấy trên trace**.
 
@@ -188,8 +185,8 @@ Không bắt buộc điền đủ năm dòng. Bắt buộc: **ít nhất ba dòn
 
 | Thành phần | Guideword | Lệch cụ thể | Hậu quả, cho ai | Cổng đề xuất: code hay con số nào trong `config/operating_gates.json` |
 |---|---|---|---|---|
-| | | | | |
-| | | | | |
+| Người duyệt (vận hành) | INCAPABLE | 14 ca dồn về trong 1 giờ cao điểm trong khi công suất ca trực chỉ xử lý 6 ca/giờ | Hàng chờ ngập, thời gian chờ vượt quá 60 phút, khách bức xúc | Đặt `operations.reviewers_on_shift: 1`, ngưỡng cảnh báo gọi thêm người trực khi hàng chờ > 6 ca trong runbook. |
+| Ngân sách (kinh doanh) | WRONG | Tổng tiền hoàn tự động trong ngày vượt quá hạn mức 2.000.000đ của Finance | Kế toán đối soát từ chối quyết toán, thâm hụt dòng tiền công ty | Đặt `business.daily_refund_cap_vnd: 2000000`, tự động dừng hoàn khi chạm trần. |
 
 **Ví dụ mẫu (`issue_refund`, đừng chép):** tham số `amount_vnd` · WRONG · số tiền tính từ số ngày khách tự khai · LogiX mất
 tiền, hãng bị kéo theo một lỗi · hiện chỉ có trần "không vượt tổng tiền đơn" · cổng ghi so với quyền lợi tính từ DB (chặn).
