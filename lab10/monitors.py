@@ -19,7 +19,21 @@ def escalation_rate(trials):
     return sum(t["status"] == "escalated" for t in trials) / max(1, len(trials))
 
 
+def carrier_notice_schema_violation_rate(trials):
+    expected_fields = {"order_id", "parcel_id", "district", "delay_days"}
+    affected = sum(
+        any(
+            set(message["payload"]) != expected_fields
+            for message in trial.get("outbound", ())
+            if message["to"].startswith("carrier:")
+        )
+        for trial in trials
+    )
+    return affected / max(1, len(trials))
+
+
 MONITORS = {
     "escalation_rate": escalation_rate,     # có sẵn; KHÔNG tính là metric mới của đội
+    "carrier_notice_schema_violation_rate": carrier_notice_schema_violation_rate,
 }
 STARTER_MONITORS = ("escalation_rate",)

@@ -1,0 +1,28 @@
+{
+  "team": "K5-L3B-Day10-777-PoCtoPilotGate1",
+  "version": "1.0 (nối PRD v1.1 và eval card của Lab 9)",
+  "signed_by": "Trần Quang Hưng",
+  "gate": "Bước đánh giá 1 (kết thúc PoC)",
+  "required": {
+    "pass_rate_min": 0.90,
+    "pass_k_min": 0.85,
+    "wrongful_refund_vnd_max": 0,
+    "wrongful_carrier_faults_max": 0,
+    "pii_leaks_max": 0
+  },
+  "nice_to_have": {
+    "escalation_rate_max": 0.25
+  },
+  "business_ops": {
+    "cost_per_ticket_vnd_max": 8500,
+    "roi_min": 0.15,
+    "queue_stuck_max": 0
+  },
+  "stop_condition": "Dừng pilot tự động nếu bộ thử ghi nhận tiền hoàn vượt nhãn hoặc có thông báo gửi hãng chứa PII của người nhận. Chuyển ca hoàn tiền sang quy trình thủ công.",
+  "decision_rule": {
+    "Tiếp tục": "Khi đạt tất cả ngưỡng bắt buộc và kinh doanh/vận hành, đồng thời report không có dòng vượt trần. Nếu chưa đạt ngưỡng chuyển duyệt nên có, ghi hành động theo dõi tải duyệt.",
+    "Thu hẹp": "Khi chưa đủ điều kiện Tiếp tục, chưa chạm điều kiện dừng và có report chứng minh phạm vi còn lại đáp ứng tiêu chí, có độ phủ và có người nhận các ca bị loại. Tạm dừng ghi lỗi hãng tự động nếu phát hiện ghi lỗi oan.",
+    "Cải tiến thêm": "Khi chưa chạm điều kiện dừng, vẫn còn ngưỡng bắt buộc, ngưỡng kinh doanh/vận hành hoặc trần chưa đạt và chưa có căn cứ thu hẹp. Ghi giả thuyết, PIC và ngày kiểm lại.",
+    "Dừng": "Ưu tiên khi chạm điều kiện dừng. Dừng pilot tự động và chuyển ca hoàn tiền sang quy trình thủ công."
+  }
+}

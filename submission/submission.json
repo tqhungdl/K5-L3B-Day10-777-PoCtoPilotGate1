@@ -1,12 +1,17 @@
 {
-  "team": "",
-  "members": [],
-  "incident": "",
-  "decision_v1": "",
-  "decision_v2": "",
+  "team": "K5-L3B-Day10-777-PoCtoPilotGate1",
+  "members": [
+    "TranQuangHung-2A202603767",
+    "NguyenTienDat-2A202603752",
+    "CaoPhamTanKhai-2A202603883",
+    "NguyenQuangHuy-2A202603768"
+  ],
+  "incident": "S7",
+  "decision_v1": "Tiếp tục",
+  "decision_v2": "Tiếp tục",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "Giả định nguồn địa chỉ luôn điền `district` là quận/huyện chuẩn hóa, dù dữ liệu đồng bộ hoặc nhập tay có thể chứa địa chỉ chi tiết.",
+    "reduce_or_prevent": "Allowlist ngăn `customer_note` và `recipient_contact` đi qua `notify_carrier` khi cổng được thực thi. Monitor phát hiện sai tập khóa, còn giá trị nhạy cảm trong trường hợp lệ cần kiểm thêm.",
+    "measure_in_pilot": "Trong pilot thật, đo tỷ lệ payload sai tập khóa, kiểm mẫu PII trong giá trị được phép và ghi thời gian từ lúc phát hiện đến lúc dừng gửi."
   }
 }
