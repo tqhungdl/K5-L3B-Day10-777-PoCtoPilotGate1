@@ -81,26 +81,26 @@ Ba loại lỗi:
 
 | # | Lỗi: người ta thấy gì (dán dòng trace / sổ cái) | Ai gặp, ai chịu | Hệ trọng (thấp / cao) | Loại lỗi (giới hạn hệ thống / ngữ cảnh / chìm) |
 |---|---|---|---|---|
-| 1 | | | | |
-| 2 | | | | |
+| 1 | `T-002@55`: `02 tracking {"order_id": "O-1002", "db_delay_days": 2, "cause": "CARRIER"}` → `03 model_override {"field": "delay_days", "db": 2, "ticket": 5}` → `06 tool {"tool": "issue_refund", "order_id": "O-1002", "amount_vnd": 20000, "payer": "LOGIX"}`. Sổ cái ghi hoàn `20.000đ` dù tracking chỉ trễ 2 ngày (theo `REFUND-v3`, `min_days_fee = 3`, nhãn đúng là `denied`, `refund_vnd = 0`). | Khách (`C-02`) nhận tiền bình thường; **LogiX chịu thiệt hại 20.000đ** và **chị Oanh (`NV-OANH`, kế toán đối soát)** phải xử lý lệch sổ cái. | Cao | **Lỗi chìm** (hệ thống trả `status: "refunded"`, khách nhận tiền không khiếu nại nên cả hai bên đều không nhận ra sai). |
+| 2 | `T-002@55`: `07 tool {"tool": "file_carrier_fault", "order_id": "O-1002", "parcel_id": "O-1002-P1", "carrier_id": "VNX", "driver_id": "TX-VNX-03", "delay_days": 5}` và `08 tool {"tool": "notify_carrier", "to": "carrier:VNX", ..., "delay_days": 5}`. Hãng `VNX` bị ghi 1 strike oan với số ngày trễ sai (5 ngày thay vì 2 ngày), nhãn đúng `faults: []`. | **Bên thứ ba: hãng vận chuyển `VNX` và tài xế `TX-VNX-03`** chịu phạt oan (`100.000đ/strike` theo `carriers[]`) và tích luỹ strike hướng tới mức đình chỉ; chị Oanh (`NV-OANH`) chịu tranh chấp đối soát. | Cao | **Lỗi chìm** (khách và trợ lý đều không thấy bất thường; chỉ lộ ra khi hãng nhận thông báo lỗi hoặc đối soát phạt). |
 
 ### Phần 2 · Tìm nguồn (đánh dấu câu nào đúng với từng lỗi)
 
 | Câu hỏi | Lỗi 1 | Lỗi 2 |
 |---|---|---|
-| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | | |
-| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | | |
-| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | | |
-| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | | |
+| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | **Có (X):** LLM trích xuất `claimed_delay_days: 5`, `trust_claim: true` từ câu khách viết rồi ghi đè lên nguồn sự thật `db_delay_days: 2` (`03 model_override`). | **Có (X):** Lan truyền trực tiếp từ `delay_days = 5` bị ghi đè từ đầu vào của khách. |
+| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | Không (tracking DB đã có đủ `db_delay_days = 2` và `cause = "CARRIER"`). | Không (tracking DB đã có đủ dữ liệu kiện `O-1002-P1` trễ 2 ngày). |
+| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | **Có (X):** Không tách bạch rõ nguồn sự thật: cho phép lời khai trong ticket (dữ liệu khách gõ) thắng dữ liệu tracking DB trước khi ghi sổ cái. | **Có (X):** Bước ghi lỗi hãng nhận `delay_days` do model suy diễn thay vì kiểm chứng trực tiếp từ tracking DB (`H.carrier_at_fault`). |
+| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | Không (không có `llm_error` hay `llm_fallback`). | Không. |
 
 ### Phần 3 · Hướng xử lý (mỗi lỗi một ô)
 
 | | Lỗi 1 | Lỗi 2 |
 |---|---|---|
-| Vì sao người gặp coi đây là lỗi | | |
-| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | | |
-| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | | |
-| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | | |
+| Vì sao người gặp coi đây là lỗi | Theo chính sách `REFUND-v3`, đơn trễ 2 ngày (`< 3 ngày`) không được hoàn phí; việc ghi chi 20.000đ vào sổ cái là chi sai chính sách và không tự đảo ngược được. | Hãng `VNX` và tài xế `TX-VNX-03` giao trễ 2 ngày (chưa vi phạm ngưỡng phạt 3 ngày) nhưng bị ghi strike 5 ngày và phạt oan 100.000đ không có căn cứ tracking. |
+| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | **Cổng chặn cấp hệ thống + trao quyền cho người** (`write_gate` trên `issue_refund` tính quyền lợi trực tiếp từ `db_delay_days` bằng `H.entitlement_vnd`; nếu phát hiện `model_override` hoặc số tiền vượt quyền lợi DB thì từ chối/chuyển người duyệt). | **Cổng chặn cấp hệ thống** (`write_gate` trên `file_carrier_fault` đối chiếu trực tiếp `H.carrier_at_fault(policy, parcel, db_delay)` từ tracking DB; không đủ điều kiện thì `Verdict.deny`). |
+| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | Khi số ngày khách khai lệch tracking DB → cổng chặn `issue_refund` (hoặc chuyển người duyệt `NV-HANH` đối chiếu) → khách nhận phản hồi rõ ràng rằng hệ thống tracking ghi nhận trễ 2 ngày, chưa đủ điều kiện hoàn phí (3 ngày). | Cổng chặn lệnh `file_carrier_fault` trước khi ghi → hãng `VNX` không bị ghi strike oan và không gửi `notify_carrier` sai; nếu khách khiếu nại độ trễ thực tế, CSKH xác minh độc lập với hãng. |
+| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | Ghi sự kiện guard trong trace và theo dõi tỉ lệ ca có `model_override` trong `lab10/monitors.py` (ví dụ `model_override_rate`). | Theo dõi số lần cổng chặn `file_carrier_fault` không khớp tracking DB và số strike/hãng/ngày trong `lab10/monitors.py` (ví dụ `carrier_fault_mismatch_rate`). |
 
 **Ví dụ (bộ nền, đừng chép):** `T-002@55` · sổ cái có dòng hoàn 20.000đ, hãng VNX nhận một lỗi, trong khi tracking ghi trễ 2 ngày ·
 khách không thấy gì sai, hãng chịu · cao · **lỗi chìm**. Nguồn: đầu vào (đặt sai trọng số cho con số khách tự khai). Xử lý:
