@@ -90,6 +90,7 @@ Giải thích một câu: …
 #### Bước 1 · Viết câu tiêu chí (mỗi chỉ số bắt buộc một câu; thử 2 phiên bản cho chỉ số bàn tranh luận nhiều nhất)
 > Nếu **{chỉ số, có đơn vị}** của **{trợ lý hoàn tiền, trên bộ thử nào}** **{tụt dưới / vượt quá}** **{ngưỡng}**
 > thì chúng tôi sẽ **{hành động cụ thể: Tiếp tục / Thu hẹp phần nào / Cải tiến thêm tới ngày nào / Dừng}**.
+
 | Chỉ số (khoá trong `acceptance_criteria.json`) | Phiên bản 1 | Phiên bản 2 (nếu có) |
 |---|---|---|
 | `pass_rate_min` | Nếu pass_rate của trợ lý hoàn tiền trên bộ nền tụt dưới 0.90 thì chúng tôi sẽ Cải tiến thêm cổng kiểm soát; nếu đạt từ 0.90 trở lên thì cân nhắc Tiếp tục pilot. | Nếu pass_rate trên bộ nền tụt dưới 0.92 thì chúng tôi sẽ Thu hẹp phạm vi, chỉ thử nghiệm tại kho WH-HN-01. |
